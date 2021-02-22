@@ -20,9 +20,9 @@ import static java.lang.Thread.sleep;
 /**
  * Created by robot on 9/17/2018.
  */
-@TeleOp(name = "9356 Mecanum Ultimate Goal")
+@TeleOp(name = " Experiment Teleop")
 
-public class Teleop extends OpMode
+public class ExperimentTeleop extends OpMode
 {
 
     HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
@@ -32,7 +32,6 @@ public class Teleop extends OpMode
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
-    double WobbleServoPosition = -1;
 
     @Override
     public void init()  {
@@ -129,23 +128,14 @@ public class Teleop extends OpMode
 
 
         if (gamepad2.b) {
-            robot.wobbleServo.setPosition(0);
-            WobbleServoPosition = -1;
+            robot.wobbleServo.setPosition(1);
         }
 
         if (gamepad2.a) {
-            WobbleServoPosition ++;
+            robot.wobbleServo.setPosition(0);
         }
 
-        if (WobbleServoPosition<30 && WobbleServoPosition>0) {
-            robot.wobbleServo.setPosition(0.9);
-        } else if (WobbleServoPosition>30) {
-            robot.wobbleServo.setPosition(0.6);
-        }
-        telemetry.addData("position", WobbleServoPosition);
-        telemetry.update();
-
-        robot.WobbleArm.setPower(gamepad2.left_stick_y*-0.25
+        robot.WobbleArm.setPower(gamepad2.left_stick_y*0.25
         );
 
         //endgame automation. Not sure if it will work.
@@ -231,9 +221,9 @@ public class Teleop extends OpMode
     public void EndgamePowershot() throws InterruptedException {
 
 
-        turnWithGyro(8.5, 0.3);
-        sleep(500);
-        robot.test.setPosition(0.4);
+    turnWithGyro(13, 0.3);
+    sleep(500);
+    robot.test.setPosition(0.4);
         sleep(500);
         robot.test.setPosition(0);
         sleep(750);

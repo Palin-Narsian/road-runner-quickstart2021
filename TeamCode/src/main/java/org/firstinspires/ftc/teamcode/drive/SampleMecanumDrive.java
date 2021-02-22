@@ -66,7 +66,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
-    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(30,0,2,15);
+    //public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(30,0,2,15);
 
 
     public static double LATERAL_MULTIPLIER = 1;
@@ -99,7 +99,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private LinkedList<Pose2d> poseHistory;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront, shooter;
+    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    //private DcMotorEx shooter;
     private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
@@ -132,10 +133,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(
-                SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f*12/hardwareMap.voltageSensor.iterator().next().getVoltage()
-        ));
+//        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(
+//                SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f*12/hardwareMap.voltageSensor.iterator().next().getVoltage()
+//        ));
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -156,7 +157,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         leftRear = hardwareMap.get(DcMotorEx.class, "lb");
         rightRear = hardwareMap.get(DcMotorEx.class, "rb");
         rightFront = hardwareMap.get(DcMotorEx.class, "rf");
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        //shooter = hardwareMap.get(DcMotorEx.class, "shooter");
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
         for (DcMotorEx motor : motors) {

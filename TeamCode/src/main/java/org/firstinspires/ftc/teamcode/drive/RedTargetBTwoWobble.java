@@ -3,19 +3,22 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
+import java.util.Arrays;
+
 import static java.lang.Math.*;
 
 @Autonomous
-
-
-public class RedTargetBOneWobble extends LinearOpMode {
+public class RedTargetBTwoWobble extends LinearOpMode {
     HardwarePushbotAutonomous robot = new HardwarePushbotAutonomous();   // Use a Pushbot's hardware
     @Override
     public void runOpMode() {
@@ -39,14 +42,27 @@ public class RedTargetBOneWobble extends LinearOpMode {
                 .splineTo(new Vector2d(20, -40), Math.toRadians(0))
                 .build();
 
-        Trajectory shortForwardB = drive.trajectoryBuilder(targetZoneB.end(), true)
-                .splineTo(new Vector2d(25, -40), Math.toRadians(0))
+        Trajectory lineUpB = drive.trajectoryBuilder(targetZoneB.end())
+                .splineTo(new Vector2d(-20, -8), Math.toRadians(25))
                 .build();
-
-        Trajectory ParkB = drive.trajectoryBuilder(shortForwardB.end())
-                .splineTo(new Vector2d(8, -40), Math.toRadians(180))
+        Trajectory goForSecondWobbleB = drive.trajectoryBuilder(lineUpB.end())
+                .lineToConstantHeading(new Vector2d(-35.8, -25.9), new MinVelocityConstraint(
+                Arrays.asList(
+                        new AngularVelocityConstraint(DriveConstants.MAX_ANG_VEL),
+                        new MecanumVelocityConstraint(5, DriveConstants.TRACK_WIDTH)
+                )
+        ),
+                new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
-
+        Trajectory lineUpToDropSecondWobbleB = drive.trajectoryBuilder(goForSecondWobbleB.end())
+                .splineTo(new Vector2d(-20, -8), Math.toRadians(170))
+                .build();
+        Trajectory secondTargetZoneB = drive.trajectoryBuilder(lineUpToDropSecondWobbleB.end(), true)
+                .splineTo(new Vector2d(25, -30), Math.toRadians(-10))
+                .build();
+        Trajectory parkSecondB = drive.trajectoryBuilder(secondTargetZoneB.end())
+                .splineTo(new Vector2d(8, -30), Math.toRadians(180))
+                .build();
 
 
 //        Trajectory aToGoal = drive.trajectoryBuilder(targetZoneA.end(),true)
@@ -63,39 +79,35 @@ public class RedTargetBOneWobble extends LinearOpMode {
 
         if(isStopRequested()) return;
 
-//        telemetry.addData("Position: ", robot.WobbleArm.getCurrentPosition());
-//        telemetry.update();
-//        drive.followTrajectory(targetZoneB);
-//        sleep(1000);
+//
+        drive.followTrajectory(targetZoneB);
+        sleep(200);
         //Deploy Wobble Goal by setting servo to open
-    WobbleMove(0.15); //extend
-    sleep(robot.MsWobbleAutonomous);
+        WobbleMove(-0.15); //extend
+        sleep(robot.MsWobbleAutonomous);
         WobbleMove(0);
         sleep(300);
-        telemetry.addData("Position: ", robot.WobbleArm.getCurrentPosition());
-        telemetry.update();
+        robot.wobbleServo.setPosition(0); // or whatever is open
+        sleep(500);
+        drive.followTrajectory(lineUpB);
+        sleep(100);
+        drive.followTrajectory(goForSecondWobbleB);
+        sleep(700);
         robot.wobbleServo.setPosition(1); // or whatever is open
-        robot.shooter.setVelocity(1000);
-        sleep(1000);
-//        WobbleMove(0);
-//        sleep(300);
-//        telemetry.addData("Position: ", robot.WobbleArm.getCurrentPosition());
-//        telemetry.update();
-//        robot.wobbleServo.setPosition(1); // or whatever is open
-//        sleep(500);
-//        drive.followTrajectory(shortForwardB);
-//        sleep(100);
-//        drive.followTrajectory(ParkB);
-//        WobbleMove(0.6); //close
-//        sleep(1400);
+        sleep(600);
+        drive.followTrajectory(lineUpToDropSecondWobbleB);
+        sleep(100);
+        drive.followTrajectory(secondTargetZoneB);
+        sleep(100);
+        robot.wobbleServo.setPosition(0); // or whatever is open
+        sleep(600);
+        drive.followTrajectory(parkSecondB);
+        sleep(100);
 
         //Deploy Arm
         //Park
 
-//        drive.followTrajectory(aToGoal);
-        //Grab Goal by setting servo to close
-        //drive.followTrajectory(goalToA);
-        //Release Goal by setting servo to open
+//
 
     }
 

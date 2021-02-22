@@ -32,8 +32,10 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -44,6 +46,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import static java.lang.Thread.sleep;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
@@ -66,12 +69,15 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
  */
 public class HardwarePushbotAutonomous
 {
+    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(30,0,2,36);
+
     // Main Motors
 
     // Wobble Goal Arm
     DcMotor WobbleArm;
     Servo wobbleServo;
-
+    DcMotorEx shooter;
+    Servo test;
     //Autonomous variables
     Integer cpr = 28; //counts per rotation
     Integer gearratio = 40;
@@ -79,6 +85,9 @@ public class HardwarePushbotAutonomous
     Double cpi = (cpr * gearratio) / (Math.PI * diameter); //counts per inch -> counts per rotation / circumference
     Double bias = 0.8;//adjust until your robot goes 20 inches
     Double meccyBias = 0.9;
+    double WobbleOpen = 0.9;
+    double WobbleClose = 0;
+    double WobbleHalfPosition = 0.6;
     //
     //
     Double conversion = cpi * bias;
@@ -114,9 +123,16 @@ public class HardwarePushbotAutonomous
         WobbleArm = hwMap.get(DcMotor.class, "WobbleArm");
         wobbleServo = hwMap.get(Servo.class, "wobbleServo");
         voltSensor = hwMap.voltageSensor.get("Control Hub");
+        shooter = hwMap.get(DcMotorEx.class, "shooter");
+        test = hwMap.servo.get("test");
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(
+                SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f*12/voltSensor.getVoltage()
+        ));
         // Set all motors to zero power
 
-
+        test.setPosition(0);
         WobbleArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         WobbleArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wobbleServo.setPosition(0);//whatever is closed
@@ -156,6 +172,14 @@ public class HardwarePushbotAutonomous
         imu.initialize(parameters);
     }
 
-
+    public void shoot() {
+        test.setPosition(0.4);
+        try {
+            sleep(750);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        test.setPosition(0);
+    }
 }
 

@@ -59,7 +59,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
  */
 public class HardwarePushbot
 {
-    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(30,0,2,15);
+    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(30,0,2,34);
     // Main Motors
     DcMotor lf;
     DcMotor rf;
@@ -69,7 +69,7 @@ public class HardwarePushbot
     DcMotor WobbleArm;
     Servo wobbleServo;
     Servo test;
-    DcMotorEx shooter;
+   public DcMotorEx shooter;
     DcMotor intake;
     protected VoltageSensor batteryVoltageSensor;
 
@@ -82,7 +82,7 @@ public class HardwarePushbot
     double wobbleServoCount = 2;
     double chassiSpeed;
     private ElapsedTime runtime = new ElapsedTime();
-    double  shooterVar = 0;
+    //double  shooterVar;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -106,11 +106,12 @@ public class HardwarePushbot
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
         wobbleServo = hwMap.get(Servo.class, "wobbleServo");
         shooter = hwMap.get(DcMotorEx.class, "shooter");
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
         test = hwMap.servo.get("test");
         batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(
-                SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f*12/hardwareMap.voltageSensor.iterator().next().getVoltage()
+                SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f*12/batteryVoltageSensor.getVoltage()
         ));
         // Set all motors to zero power
         lf.setPower(0);
@@ -126,7 +127,7 @@ public class HardwarePushbot
         test.setPosition(0);
         WobbleArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         WobbleArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wobbleServo.setPosition(1);
+        wobbleServo.setPosition(0.6);
 
         chassiSpeed = 1;
 
@@ -155,15 +156,11 @@ public class HardwarePushbot
         lb.setPower(v3);
         rb.setPower(v4);
     }
-    public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
-        PIDFCoefficients compensatedCoefficients = new PIDFCoefficients(
-                coefficients.p, coefficients.i, coefficients.d,
-                coefficients.f * 12 / batteryVoltageSensor.getVoltage()
-        );
-        for (DcMotorEx shooter) {
-            shooter.setPIDFCoefficients(runMode, compensatedCoefficients);
-        }
-    }
+    public void setPIDFCoefficients(DcMotorEx motor, PIDFCoefficients coefficients) {
+    motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(
+            coefficients.p, coefficients.i, coefficients.d, coefficients.f * 12 / batteryVoltageSensor.getVoltage()
+    ));
+}
 
 }
 

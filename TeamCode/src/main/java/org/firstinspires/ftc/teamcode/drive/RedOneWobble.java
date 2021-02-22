@@ -53,13 +53,15 @@ public class RedOneWobble extends LinearOpMode {
         robot.init(hardwareMap);
         drive.setPoseEstimate(startPose);
         if (robot.voltSensor.getVoltage()>= 14) {
-            robot.MsWobbleAutonomous = 900;
-        } else if(robot.voltSensor.getVoltage()<14 && robot.voltSensor.getVoltage()>=13){
             robot.MsWobbleAutonomous = 1000;
-        } else if (robot.voltSensor.getVoltage()<13 && robot.voltSensor.getVoltage()>=12.5) {
-            robot.MsWobbleAutonomous = 1060;
-        } else if (robot.voltSensor.getVoltage()<12.5){
+        } else if(robot.voltSensor.getVoltage()<14 && robot.voltSensor.getVoltage()>=13.5){
             robot.MsWobbleAutonomous = 1100;
+        } else if (robot.voltSensor.getVoltage()<13.5 && robot.voltSensor.getVoltage()>=13){
+            robot.MsWobbleAutonomous = 1300;
+        } else if (robot.voltSensor.getVoltage()<13 && robot.voltSensor.getVoltage()>=12.5) {
+            robot.MsWobbleAutonomous = 1360;
+        } else if (robot.voltSensor.getVoltage()<12.5){
+            robot.MsWobbleAutonomous = 1400;
         }
         Trajectory targetZoneA = drive.trajectoryBuilder(startPose, true)
                 .splineTo(new Vector2d(-5, -58), Math.toRadians(0))
@@ -132,10 +134,10 @@ public class RedOneWobble extends LinearOpMode {
                 WobbleMove(-0.15); //extend
                 sleep(robot.MsWobbleAutonomous);
                 WobbleMove(0);
-                sleep(300);
+                sleep(800);
                 telemetry.addData("Position: ", robot.WobbleArm.getCurrentPosition());
                 telemetry.update();
-                robot.wobbleServo.setPosition(1); // or whatever is open
+                robot.wobbleServo.setPosition(0); // or whatever is open
                 sleep(500);
                 drive.followTrajectory(shortForwardC);
                 sleep(100);
@@ -151,10 +153,10 @@ public class RedOneWobble extends LinearOpMode {
                 WobbleMove(-0.15); //extend
                 sleep(robot.MsWobbleAutonomous);
                 WobbleMove(0);
-                sleep(300);
+                sleep(800);
                 telemetry.addData("Position: ", robot.WobbleArm.getCurrentPosition());
                 telemetry.update();
-                robot.wobbleServo.setPosition(1); // or whatever is open
+                robot.wobbleServo.setPosition(0); // or whatever is open
                 sleep(500);
                 drive.followTrajectory(shortForwardB);
                 sleep(100);
@@ -171,7 +173,7 @@ public class RedOneWobble extends LinearOpMode {
                 sleep(300);
                 telemetry.addData("Position: ", robot.WobbleArm.getCurrentPosition());
                 telemetry.update();
-                robot.wobbleServo.setPosition(1); // or whatever is open
+                robot.wobbleServo.setPosition(0); // or whatever is open
                 sleep(500);
                 drive.followTrajectory(shortForwardA);
                 drive.followTrajectory(shortBackwardA);
@@ -217,12 +219,12 @@ public class RedOneWobble extends LinearOpMode {
         /*
          * The core values which define the location and size of the sample regions
          */
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(175,130);
+        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(165,130);
 
         static final int REGION_WIDTH = 30;
         static final int REGION_HEIGHT = 30;
 
-        final int FOUR_RING_THRESHOLD = 143;
+        final int FOUR_RING_THRESHOLD = 151;
         final int ONE_RING_THRESHOLD = 132;
 
         Point region1_pointA = new Point(
